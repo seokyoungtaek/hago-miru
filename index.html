@@ -214,9 +214,9 @@
         .result-buttons-container {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-top: 1rem; 
-            margin-bottom: 5rem;
+            gap: 15px;
+            margin-top: 1.5rem; 
+            margin-bottom: 0; 
             flex-wrap: wrap; 
         }
         .result-buttons-container button {
@@ -252,6 +252,22 @@
             line-height: 1.4;
         }
 
+        /* ======================================= */
+        /* ============== 여기를 추가했습니다 ============== */
+        /* ======================================= */
+        .result-disclaimer {
+            margin-top: 3rem;
+            padding: 0 1rem;
+            font-size: 0.85rem;
+            color: #999;
+            line-height: 1.6;
+        }
+        .result-disclaimer p {
+            margin: 0;
+            font-size: inherit; /* 부모 요소의 글자 크기를 상속받도록 설정 */
+            color: inherit; /* 부모 요소의 글자 색상을 상속받도록 설정 */
+        }
+
 
         /* ======== 기타 ======== */
         #visitor-counter { 
@@ -273,6 +289,10 @@
             animation: subtle-pulse 2s ease-in-out infinite; 
         }
         
+        .result-page-spacer {
+            height: 100px; /* 하단에 100px의 보이지 않는 공간을 만들어 스크롤 길이를 확보합니다. */
+        }
+
         /* ======== 반응형 스타일 ======== */
         @media (max-width: 480px) { 
             body { 
@@ -342,6 +362,19 @@
             <button class="secondary-btn" onclick="shareResult()">🔗 링크 공유</button>
             <button class="secondary-btn" onclick="restartTest()">🔁 다시하기</button>
         </div>
+
+        <!-- ======================================= -->
+        <!-- ============== 여기를 추가했습니다 ============== -->
+        <!-- ======================================= -->
+        <div class="result-disclaimer">
+            <p>
+                🧬 본 테스트는 실제 과학적 근거에 기반한 진단이 아니며,
+                재미와 자기이해를 위한 콘텐츠로 제작되었습니다.
+                부담 없이 즐기시고, 나의 ‘하고잡이 DNA’를 발견하는 시간이 되시길 바랍니다 😊
+            </p>
+        </div>
+
+        <div class="result-page-spacer"></div>
     </div>
 
     <!-- 4. 방문자 카운터 -->
@@ -639,7 +672,11 @@
             
             html2canvas(captureArea, {
                 backgroundColor: '#fdfaf5',
-                scale: 2 
+                scale: 2,
+                // 캡처 시 스크롤을 맨 위로 올려서 전체 페이지가 잘 나오도록 함
+                scrollY: -window.scrollY,
+                windowWidth: document.documentElement.offsetWidth,
+                windowHeight: document.documentElement.offsetHeight
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.href = canvas.toDataURL('image/png');
