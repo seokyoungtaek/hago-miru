@@ -4,182 +4,696 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>하고잡이 & 미루잡이 DNA 테스트</title>
+    <!-- 이미지 캡처 기능을 위한 라이브러리 추가 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
-        html, body { height: 100%; margin: 0; }
-        body { font-family: 'Noto Sans KR', 'Arial', sans-serif; padding: 2rem; background: #fdfaf5; color: #333; transition: background-color 0.5s; box-sizing: border-box; overflow-y: auto; position: relative; }
-        .page { display: none; max-width: 650px; margin: 0 auto; text-align: center; position: relative; z-index: 1; }
-        .page.active { display: block; }
-        #intro-page.active { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100%; box-sizing: border-box; }
-        h1 { font-size: 2.2rem; color: #ff6347; margin-bottom: 1rem; line-height: 1.4; }
-        #intro-page h1 { margin-top: 0; margin-bottom: 1.5rem; }
-        h2 { font-size: 1.6rem; color: #333; line-height: 1.5; }
-        p { font-size: 1.1rem; line-height: 1.7; color: #555;}
-        strong { color: #ff6347; font-weight: 700; }
-        .intro-box { background-color: #fff; padding: 1.5rem 2rem; border-radius: 12px; margin: 2rem auto; border: 1px solid #f0e9e0; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07); }
-        .intro-box p { margin-bottom: 1.2rem; }
-        .intro-box p:last-child { margin-bottom: 0; }
-        button { padding: 1rem 2rem; margin: 0.5rem; font-size: 1.1rem; font-weight: 700; color: white; background-color: #ff6347; border: none; cursor: pointer; border-radius: 10px; transition: background-color 0.3s, transform 0.2s; min-width: 220px; box-sizing: border-box; box-shadow: 0 4px 10px rgba(255, 99, 71, 0.3); }
-        button:hover { background-color: #e5533c; transform: translateY(-2px); }
-        .answer-btn { display: block; width: 100%; background-color: #fff; color: #333; border: 1px solid #ddd; margin: 0.8rem 0; box-shadow: none;}
-        .answer-btn:hover { background-color: #f0f0f0; border-color: #ccc; }
-        .secondary-btn { background-color: #868e96; box-shadow: 0 4px 10px rgba(108, 117, 125, 0.2); }
-        .secondary-btn:hover { background-color: #6c757d; }
-        button:disabled { background-color: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
-        .progress-bar { width: 100%; background-color: #e0e0e0; border-radius: 10px; margin: 2rem 0; }
-        .progress { height: 10px; width: 0%; background-color: #ff6347; border-radius: 10px; transition: width 0.3s ease-in-out; }
-        #result-container h2 { margin-bottom: 0.5rem; }
-        .result-slogan { font-size: 1.2rem; color: #555; margin-top: 0; margin-bottom: 2.5rem; font-weight: 700; }
-        .dna-graph-container { width: 100%; margin: 0 auto 2rem; text-align: left; }
-        .dna-graph-label { display: flex; justify-content: space-between; font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+        
+        /* ======== 기본 스타일 ======== */
+        html, body { 
+            height: 100%; 
+            margin: 0; 
+        }
+        body { 
+            font-family: 'Noto Sans KR', 'Arial', sans-serif; 
+            padding: 2rem; 
+            background: #fdfaf5; 
+            color: #333; 
+            transition: background-color 0.5s; 
+            box-sizing: border-box; 
+            overflow-y: auto; 
+            position: relative; 
+        }
+        .page { 
+            display: none; 
+            max-width: 650px; 
+            margin: 0 auto; 
+            text-align: center; 
+            position: relative; 
+            z-index: 1; 
+        }
+        .page.active { 
+            display: block; 
+        }
+        
+        /* ======== 페이지별 레이아웃 ======== */
+        #intro-page.active { 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100%; 
+            box-sizing: border-box; 
+        }
+
+        /* ======== 텍스트 및 제목 ======== */
+        h1 { 
+            font-size: 2.2rem; 
+            color: #ff6347; 
+            margin-bottom: 1rem; 
+            line-height: 1.4; 
+        }
+        #intro-page h1 { 
+            margin-top: 0; 
+            margin-bottom: 1.5rem; 
+        }
+        h2 { 
+            font-size: 1.6rem; 
+            color: #333; 
+            line-height: 1.5; 
+        }
+        p { 
+            font-size: 1.1rem; 
+            line-height: 1.7; 
+            color: #555;
+        }
+        strong { 
+            color: #ff6347; 
+            font-weight: 700; 
+        }
+
+        /* ======== 컴포넌트 ======== */
+        .intro-box { 
+            background-color: #fff; 
+            padding: 1.5rem 2rem; 
+            border-radius: 12px; 
+            margin: 2rem auto; 
+            border: 1px solid #f0e9e0; 
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07); 
+        }
+        button { 
+            padding: 1rem 2rem; 
+            margin: 0.5rem; 
+            font-size: 1.1rem; 
+            font-weight: 700; 
+            color: white; 
+            background-color: #ff6347; 
+            border: none; 
+            cursor: pointer; 
+            border-radius: 10px; 
+            transition: background-color 0.3s, transform 0.2s; 
+            min-width: 220px; 
+            box-sizing: border-box; 
+            box-shadow: 0 4px 10px rgba(255, 99, 71, 0.3); 
+        }
+        button:hover { 
+            background-color: #e5533c; 
+            transform: translateY(-2px); 
+        }
+        button:disabled { 
+            background-color: #ccc; 
+            cursor: not-allowed; 
+            transform: none; 
+            box-shadow: none; 
+        }
+        .answer-btn { 
+            display: block; 
+            width: 100%; 
+            background-color: #fff; 
+            color: #333; 
+            border: 1px solid #ddd; 
+            margin: 0.8rem 0; 
+            box-shadow: none;
+        }
+        .answer-btn:hover { 
+            background-color: #f0f0f0; 
+            border-color: #ccc; 
+        }
+        .secondary-btn { 
+            background-color: #868e96; 
+            box-shadow: 0 4px 10px rgba(108, 117, 125, 0.2); 
+        }
+        .secondary-btn:hover { 
+            background-color: #6c757d; 
+        }
+        .progress-bar { 
+            width: 100%; 
+            background-color: #e0e0e0; 
+            border-radius: 10px; 
+            margin: 2rem 0; 
+        }
+        .progress { 
+            height: 10px; 
+            width: 0%; 
+            background-color: #ff6347; 
+            border-radius: 10px; 
+            transition: width 0.3s ease-in-out; 
+        }
+        
+        /* ======== 결과 페이지 스타일 ======== */
+        #result-container h2 { 
+            margin-bottom: 0.5rem; 
+        }
+        .result-slogan { 
+            font-size: 1.2rem; 
+            color: #555; 
+            margin-top: 0; 
+            margin-bottom: 2.5rem; 
+            font-weight: 700; 
+        }
+        .result-section { 
+            background-color: #fff; 
+            padding: 1.8rem; 
+            border-radius: 10px; 
+            margin-top: 1.5rem; 
+            text-align: left; 
+            border: 1px solid #eee; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+        }
+        .result-section h3 { 
+            color: #ff6347; 
+            margin-top: 0; 
+            margin-bottom: 1rem; 
+            font-size: 1.4rem; 
+        }
+        .result-section ul { 
+            padding-left: 20px; 
+            margin: 10px 0 0; 
+        }
+        .result-section li { 
+            margin-bottom: 14px; 
+            line-height: 1.7; 
+            font-size: 1.1rem; 
+        }
+        .dna-graph-container { 
+            width: 100%; 
+            margin: 0 auto 2rem; 
+            text-align: left; 
+        }
+        .dna-graph-label { 
+            display: flex; 
+            justify-content: space-between; 
+            font-size: 1rem; 
+            font-weight: 700; 
+            margin-bottom: 0.5rem; 
+        }
         .hagojabi-label { color: #ff6347; }
         .mirujabi-label { color: #868e96; }
-        .dna-graph-bar { display: flex; width: 100%; height: 28px; background-color: #e9ecef; border-radius: 8px; overflow: hidden; }
-        .dna-graph-bar > div { height: 100%; color: white; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 700; transition: width 1.2s ease-in-out; white-space: nowrap; }
+        .dna-graph-bar { 
+            display: flex; 
+            width: 100%; 
+            height: 28px; 
+            background-color: #e9ecef; 
+            border-radius: 8px; 
+            overflow: hidden; 
+        }
+        .dna-graph-bar > div { 
+            height: 100%; 
+            color: white; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 0.9rem; 
+            font-weight: 700; 
+            transition: width 1.2s ease-in-out; 
+            white-space: nowrap; 
+        }
         .hagojabi-bar { background-color: #ff6347; }
         .mirujabi-bar { background-color: #868e96; }
-        .result-type-desc p { font-size: 1.1rem; line-height: 1.8; margin-bottom: 1rem; }
-        .result-type-desc p:last-child { margin-bottom: 0; }
-        .result-section { background-color: #fff; padding: 1.8rem; border-radius: 10px; margin-top: 1.5rem; text-align: left; border: 1px solid #eee; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .result-section h3 { color: #ff6347; margin-top: 0; margin-bottom: 1rem; font-size: 1.4rem; }
-        .result-section ul { padding-left: 20px; margin: 10px 0 0; }
-        .result-section li { margin-bottom: 14px; line-height: 1.7; font-size: 1.1rem; }
-        .result-section p { font-size: 1.1rem; }
-        #visitor-counter { position: fixed; bottom: 15px; left: 15px; background-color: rgba(0, 0, 0, 0.6); color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.85rem; z-index: 999; font-weight: 700; }
-        #end-page .result-section { text-align: center; }
-        #end-page blockquote { background: #f9f9f9; border-left: 5px solid #ff6347; margin: 1.5em 10px; padding: 1em 15px; font-style: italic; color: #555; line-height: 1.8; }
-        @keyframes subtle-pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
-        #test-page h1 { animation: subtle-pulse 2s ease-in-out infinite; }
-        @media (max-width: 480px) { body { padding: 1rem; -webkit-text-size-adjust: 100%; } #intro-page.active { justify-content: space-around; padding: 1rem 0; } h1 { font-size: 1.8rem; } #intro-page h1 { font-size: 1.6rem; margin: 0.5rem 0; } h2 { font-size: 1.3rem; } .result-slogan { font-size: 1.1rem; } .intro-box { padding: 1rem; margin: 1rem auto; } .intro-box p { font-size: 0.95rem; line-height: 1.6; } .result-section { padding: 1.2rem; } button { padding: 0.9rem 1rem; font-size: 1rem; width: 100%; } }
+
+        .result-buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 1.5rem; 
+            margin-bottom: 2rem;
+            flex-wrap: wrap; 
+        }
+        .result-buttons-container button {
+            min-width: auto;
+            flex: 1; 
+            max-width: 210px; 
+        }
+
+        .dna-extra-container {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 2rem;
+            padding: 1.2rem;
+            border-radius: 8px;
+            background-color: #fdfaf5;
+            border: 1px dashed #ffe0d9;
+        }
+        .dna-extra-item {
+            flex: 1;
+            text-align: center;
+        }
+        .dna-extra-item h4 {
+            margin: 0 0 0.7rem 0;
+            font-size: 1.1rem;
+            color: #555;
+            font-weight: 700;
+        }
+        .dna-extra-item p {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #333;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+
+        /* ======== 기타 ======== */
+        #visitor-counter { 
+            position: fixed; 
+            bottom: 15px; 
+            left: 15px; 
+            background-color: rgba(0, 0, 0, 0.6); 
+            color: white; 
+            padding: 6px 12px; 
+            border-radius: 8px; 
+            font-size: 0.85rem; 
+            z-index: 999; 
+            font-weight: 700; 
+        }
+        @keyframes subtle-pulse { 
+            0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } 
+        }
+        #test-page h1 { 
+            animation: subtle-pulse 2s ease-in-out infinite; 
+        }
+        
+        /* ======== 반응형 스타일 ======== */
+        @media (max-width: 480px) { 
+            body { 
+                padding: 1rem; 
+                -webkit-text-size-adjust: 100%; 
+            } 
+            #intro-page.active { 
+                justify-content: space-around; 
+                padding: 1rem 0; 
+            } 
+            h1 { font-size: 1.8rem; } 
+            h2 { font-size: 1.3rem; } 
+            .intro-box { 
+                padding: 1rem; 
+                margin: 1rem auto; 
+            } 
+            .intro-box p { 
+                font-size: 0.95rem; 
+                line-height: 1.6; 
+            } 
+            .result-section { 
+                padding: 1.2rem; 
+            } 
+            button { 
+                padding: 0.9rem 1rem; 
+                font-size: 1rem; 
+                width: 100%; 
+            }
+            .result-buttons-container button {
+                padding: 0.8rem 0.5rem;
+                font-size: 0.85rem;
+            }
+            .dna-extra-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- HTML 구조는 이전과 동일 -->
-    <div id="intro-page" class="page active"><h1>🧬 하고잡이 & 미루잡이 🧬<br>DNA 테스트</h1><div class="intro-box"><p><strong>‘해야 하니까’ vs ‘하고 싶어서’</strong><br>당신의 DNA는 어디에 가까울까요?</p><p>하고잡이 DNA일까요,<br>귀엽게 미루는 미루잡이 DNA일까요?<br><small>(※ 미루잡이: 자꾸 내일로 미루는 자의 귀여운 별칭 🐌)</small></p></div><p>🙋 지금, 클릭 한 번으로<br>당신의 DNA를 스캔해보세요!</p><button onclick="startTest()">🚀 테스트 시작하기</button></div>
-    <div id="test-page" class="page"><h1>🧠 하고잡이 & 미루잡이 DNA 스캔중 🧠</h1><div class="progress-bar"><div id="progress" class="progress"></div></div><div id="question-box"></div><div id="answer-box"></div></div>
-    <div id="result-page" class="page"><h1>🔬 스캔 완료! 당신의 DNA 분석 결과 🔬</h1><div id="result-container"></div><button id="submitBtn" onclick="submitResult()">🚀 케미 매칭!</button><button class="secondary-btn" onclick="shareResult()">🔗 링크 공유하기</button><button class="secondary-btn" onclick="restartTest()">🔁 다시하기</button></div>
-    <div id="end-page" class="page"><h2>당신의 하고잡이 & 미루잡이 DNA 분석이 끝났습니다.</h2><p>참여해주셔서 감사합니다!</p><div class="result-section" style="margin-top: 2rem;"><p>여기까지 하셨다면… 이제 뭔가 하고 싶어지는 느낌, 들지 않나요? 😉<br>그 마음, 지금 바로 한 걸음 옮겨보세요.</p><hr style="border: 0; border-top: 1px solid #eee; margin: 2rem 0;"><p>🗓 8월 인사이트보드의 키워드는 <strong>“혁신”</strong>입니다.</p><blockquote>“나의 작은 한 줄이,<br>누군가의 생각을 바꾸는 큰 울림이 될 수 있습니다.”</blockquote><p style="margin-top: 1.5rem;">💬 지금 당신이 생각하는 ‘혁신’을 담은 명언 한 줄을 추천해 주세요.</p></div><button onclick="window.open('https://docs.google.com/forms/d/1ycX9SYVY19-OgEAOsTIgq9mTorwWccCRltOr8WGsg7w/edit', '_blank')" style="margin-top: 2rem;">💡 명언 추천하러가기</button><button class="secondary-btn" onclick="restartTest()" style="margin-top: 1rem;">처음으로 돌아가기</button></div>
+    <!-- 1. 시작 페이지 -->
+    <div id="intro-page" class="page active">
+        <h1>🧬 하고잡이 & 미루잡이 🧬<br>DNA 테스트</h1>
+        <div class="intro-box">
+            <p><strong>‘해야 하니까’ vs ‘하고 싶어서’</strong><br>당신의 DNA는 어디에 가까울까요?</p>
+            <p>하고잡이 DNA일까요,<br>귀엽게 미루는 미루잡이 DNA일까요?<br><small>(※ 미루잡이: 자꾸 내일로 미루는 자의 귀여운 별칭 🐌)</small></p>
+        </div>
+        <p>🙋 지금, 클릭 한 번으로<br>당신의 DNA를 스캔해보세요!</p>
+        <button onclick="startTest()">🚀 테스트 시작하기</button>
+    </div>
+
+    <!-- 2. 테스트 진행 페이지 -->
+    <div id="test-page" class="page">
+        <h1>🧠 하고잡이 & 미루잡이 DNA 스캔중 🧠</h1>
+        <div class="progress-bar"><div id="progress" class="progress"></div></div>
+        <div id="question-box"></div>
+        <div id="answer-box"></div>
+        <button id="back-btn" onclick="goBack()" class="secondary-btn" style="margin-top: 2rem; width: auto; min-width: 180px; display: none;">이전 질문으로</button>
+    </div>
+
+    <!-- 3. 결과 페이지 -->
+    <div id="result-page" class="page">
+        <h1>🔬 스캔 완료! 당신의 DNA 스캔 결과 🔬</h1>
+        <div id="result-container"></div>
+        <div class="result-buttons-container">
+            <button id="captureBtn" onclick="captureResult()">📸 캡처 하기</button>
+            <button class="secondary-btn" onclick="shareResult()">🔗 링크 공유</button>
+            <button class="secondary-btn" onclick="restartTest()">🔁 다시하기</button>
+        </div>
+    </div>
+
+    <!-- 4. 방문자 카운터 -->
     <div id="visitor-counter"></div>
 
     <script>
+        // ======== 페이지 요소 ========
         const introPage = document.getElementById('intro-page');
         const testPage = document.getElementById('test-page');
         const resultPage = document.getElementById('result-page');
-        const endPage = document.getElementById('end-page');
-        const questions = [ { q: "새 프로젝트가 시작됐다! 나의 첫 반응은?", a: [{ text: "할 일부터 쭉 적고 바로 실행!", score: "실행형" }, { text: "신박한 아이디어 하나 던져본다", score: "아이디어형" }, { text: "분위기를 파악하며 조용히 접근", score: "잠재형" }] }, { q: "업무 중 예상치 못한 벽을 만났을 때 나는?", a: [{ text: "원인을 분석하며 깊이 파고든다", score: "탐구형" }, { text: "해결보다 먼저 팀과 이야기해본다", score: "협업형" }, { text: "어제보다 나아지려 다시 시도", score: "성장형" }] }, { q: "할 일이 산더미처럼 많은 날, 나의 태도는?", a: [{ text: "무엇을 먼저 할지 계획부터!", score: "개척형" }, { text: "할 일은 많아도 긍정! 해낼 수 있어!", score: "응원형" }, { text: "지금은 조용히... 기회를 기다린다", score: "잠재형" }] }, { q: "팀 회의 시간, 내 생각과 다른 의견이 나왔다.", a: [{ text: "내 아이디어의 장점을 논리적으로 설득한다", score: "탐구형" }, { text: "좋은 점을 수용하며 더 나은 방향을 모색한다", score: "협업형" }, { text: "일단 들어보고 더 좋은 아이디어를 떠올린다", score: "아이디어형" }] }, { q: "새로운 기술이나 툴을 배워야 할 때 나는?", a: [{ text: "흥미로운데? 당장 써먹어봐야지!", score: "실행형" }, { text: "이걸 배우면 어떻게 성장할 수 있을까?", score: "성장형" }, { text: "원리와 구조부터 차근차근 공부한다", score: "탐구형" }] }, { q: "동료가 업무로 힘들어 보일 때, 나는?", a: [{ text: "따뜻한 커피와 함께 격려의 말을 건넨다", score: "응원형" }, { text: "내가 도울 수 있는 부분이 있는지 물어본다", score: "협업형" }, { text: "조용히 그가 스스로 해결하길 믿고 지켜본다", score: "잠재형" }] }, { q: "아무도 가지 않은 길을 가야하는 상황이라면?", a: [{ text: "내가 첫 발자국을 남긴다! 지도 그리기 시작!", score: "개척형" }, { text: "위험 요소는 없는지 철저히 분석부터", score: "탐구형" }, { text: "실패해도 괜찮아, 배우는 게 있을 거야!", score: "성장형" }] }, { q: "반복적인 업무를 처리할 때 나의 모습은?", a: [{ text: "더 효율적인 방법은 없을까? 자동화를 고민한다", score: "아이디어형" }, { text: "가장 빠르고 정확하게 끝내는 것에 집중한다", score: "실행형" }, { text: "이 과정에서 내가 얻을 수 있는 의미를 찾는다", score: "성장형" }] }, { q: "큰 성공을 거둔 프로젝트, 나의 역할은?", a: [{ text: "성공의 기쁨을 팀원들과 함께 나눈다", score: "응원형" }, { text: "우리가 왜 성공했는지 회고하고 기록한다", score: "탐구형" }, { text: "다음 목표는 무엇일지 바로 구상한다", score: "개척형" }] }, { q: "아이디어는 좋지만 실현 가능성이 낮다는 피드백을 받았다.", a: [{ text: "함께할 사람들을 모아 설득하고 힘을 얻는다", score: "협업형" }, { text: "피드백을 바탕으로 아이디어를 더 발전시킨다", score: "성장형" }, { text: "그렇다면, 지금 당장 실현 가능한 작은 것부터!", score: "실행형" }] }, { q: "나에게 '도전'이란?", a: [{ text: "가보지 않은 길을 탐험하는 것", score: "개척형" }, { text: "새로운 아이디어를 세상에 내놓는 것", score: "아이디어형" }, { text: "어제의 나를 뛰어넘는 것", score: "성장형" }] }, { q: "프로젝트가 끝난 후, 나는 주로 어떤 생각을 할까?", a: [{ text: "모두 고생 많았어! 우리 팀 최고!", score: "응원형" }, { text: "다음엔 뭘 해볼까? 새로운 목표를 찾는다", score: "개척형" }, { text: "혼자만의 시간을 가지며 에너지를 충전한다", score: "잠재형" }] } ];
-        const newResultData = { "불도저형 하고잡이": { slogan: "망설임은 없어! 일단 밀어붙여! 하고!", desc: "<p>강력한 목표 지향성과 실행력을 바탕으로 어떤 과업이든 거침없이 밀어붙이는 유형입니다. 복잡한 생각보다는 일단 행동으로 옮겨 결과를 만들어내는 것을 선호하며, 그 과정에서 나타나는 문제들을 정면으로 돌파하는 데서 성취감을 느낍니다.</p><p>당신의 존재는 팀의 추진력을 높이는 강력한 엔진과 같지만, 때로는 너무 빠른 속도로 인해 주변을 살피지 못하거나 디테일을 놓칠 수 있습니다. 협업 시에는 의도적으로 속도를 조절하며 팀원들의 의견을 구하는 자세가 더 큰 성공을 가져올 것입니다.</p>", actionPlan: { details: ["가장 중요한 일 하나를 정해, 다른 모든 것을 제치고 그것부터 끝내보세요.", "행동하기 전, '이 일이 목표에 정말 도움이 될까?' 딱 5초만 생각해보세요.", "나의 추진력이 팀원들에게 부담이 되지 않는지 속도를 조절하는 연습을 해보세요."] }, compatibility: { best: "<strong>환상의 궁합: 판벌이형 하고잡이 🧐</strong><br>당신이 길을 닦으며 달릴 때, 판벌이형은 그 길이 올바른 방향인지, 더 넓은 그림은 없는지 확인해줍니다. 당신의 추진력에 전략을 더해줄 최고의 파트너입니다.", good: "<strong>의외의 궁합: 생각많은형 미루잡이 🤔</strong><br>당신이 놓칠 수 있는 디테일과 위험요소를 생각많은형이 꼼꼼하게 짚어줍니다. 서로의 단점을 완벽하게 보완해주는 조합입니다." } }, "하고보자형 하고잡이": { slogan: "일단 해보는 게 최고! 뭐든지 도전해! 하고!", desc: "<p>실패를 두려워하지 않고 새로운 도전을 학습의 기회로 삼는 긍정적인 탐험가 유형입니다. '완벽한 계획'보다는 '빠른 실행과 개선'을 중요하게 생각하며, 당신의 에너지는 주변 사람들에게도 새로운 시도를 해볼 용기를 줍니다.</p><p>새로운 아이디어나 기술에 대한 수용성이 높아 트렌드를 빠르게 습득하고 적용합니다. 다만, 때로는 너무 많은 일을 벌여 마무리가 어려울 수 있으니, '시작'만큼 '마무리'의 중요성을 인지하고 작은 성공을 차곡차곡 쌓아나가는 것이 중요합니다.</p>", actionPlan: { details: ["아이디어만 있던 일을 '작은 실험'이라 생각하고 오늘 당장 시도해보세요.", "나의 도전에 함께할 동료를 한 명 만들어보세요. 지지와 동기부여가 될 거예요.", "도전의 과정을 간단하게 기록으로 남겨 '나만의 경험 노트'를 만들어보세요."] }, compatibility: { best: "<strong>환상의 궁합: 팔색조형 하고잡이 🎨</strong><br>당신이 새로운 도전을 시작할 때, 팔색조형은 어떤 역할이든 유연하게 맡아주며 든든한 지원군이 됩니다. 함께라면 어떤 프로젝트든 성공적으로 이끌 수 있습니다.", good: "<strong>의외의 궁합: 완벽주의형 미루잡이 🧐</strong><br>당신의 빠른 실행에 완벽주의형의 꼼꼼함이 더해져 결과물의 완성도를 높여줍니다. 속도와 퀄리티, 두 마리 토끼를 모두 잡는 조합입니다." } }, "판벌이형 하고잡이": { slogan: "이왕 할 거면 제대로! 끝까지 파고들자! 하고!", desc: "<p>표면적인 이해에 만족하지 않고, 일의 본질과 구조를 파악하기 위해 깊이 파고드는 지적 탐구자 유형입니다. 일단 흥미가 생긴 분야는 전문가 수준의 지식을 쌓아야 직성이 풀리며, 이러한 깊이 있는 분석은 팀이 방향을 잃지 않도록 돕는 등대 역할을 합니다.</p><p>당신의 통찰력은 복잡한 문제의 핵심을 꿰뚫고 근본적인 해결책을 제시합니다. 하지만 때로는 너무 깊이 파고든 나머지 전체적인 맥락이나 마감 기한을 놓칠 수 있습니다. 주기적으로 숲 전체를 조망하는 습관을 들이는 것이 좋습니다.</p>", actionPlan: { details: ["현재 업무와 관련해 더 깊이 알고 싶은 주제를 정해 30분간 집중적으로 탐구해보세요.", "나의 전문성을 동료들에게 공유하는 '미니 세미나'를 열어보세요.", "깊게 파고들다 길을 잃지 않도록, 주기적으로 전체 목표와 방향을 확인하세요."] }, compatibility: { best: "<strong>환상의 궁합: 불도저형 하고잡이</strong><br>당신이 깊이 있게 파고들어 길을 제시하면, 불도저형은 그 길을 거침없이 달려나갑니다. 전략과 실행의 완벽한 시너지를 보여줍니다.", good: "<strong>의외의 궁합: 할게많은형 미루잡이 🏃‍♀️</strong><br>당신이 한 우물을 팔 때, 할게많은형은 다른 급한 불들을 꺼주며 당신이 집중할 수 있는 환경을 만들어줍니다." } }, "팔색조형 하고잡이": { slogan: "팀에 필요하다면 변신! 뭐든지 도와줄게! 하고!", desc: "<p>팀의 목표 달성을 위해 자신을 기꺼이 맞추는 뛰어난 팀플레이어 유형입니다. 정해진 역할에 얽매이지 않고, 현재 상황에 가장 필요한 역할을 유연하게 수행해냅니다. 뛰어난 공감 능력과 소통 능력을 바탕으로 팀의 윤활유 역할을 톡톡히 해냅니다.</p><p>갈등 상황을 중재하고 팀원들의 강점을 연결하여 시너지를 만드는 데 탁월합니다. 다만, 여러 역할을 수행하다 보면 자신의 성장에 소홀해지거나 정체성이 모호해질 수 있습니다. 팀에 기여하는 동시에 '나만의 전문성'을 키우려는 노력이 필요합니다.</p>", actionPlan: { details: ["이번 주, 내가 평소에 하지 않던 동료의 일을 조금 도와주며 새로운 역할을 경험해보세요.", "팀원들의 장점을 파악하고, 그들이 빛날 수 있도록 연결고리 역할을 해보세요.", "다양한 역할을 하다 번아웃되지 않도록, 나의 핵심 역할과 우선순위를 잊지 마세요."] }, compatibility: { best: "<strong>환상의 궁합: 하고보자형 하고잡이 🚀</strong><br>새로운 일을 벌이기 좋아하는 하고보자형에게 당신의 유연함은 천군만마와 같습니다. 어떤 상황에서도 믿고 맡길 수 있는 최고의 팀플레이어 조합입니다.", good: "<strong>의외의 궁합: 영혼탈출형 미루잡이 💭</strong><br>당신은 딴생각에 빠진 영혼탈출형을 현실로 부드럽게 이끌어주고, 그는 당신에게 예상치 못한 창의적인 영감을 주기도 합니다." } }, "생각많은형 미루잡이": { slogan: "완벽한 계획이 먼저! 생각부터 다 하고! 미루!", desc: "<p>행동에 앞서 발생 가능한 모든 경우의 수를 시뮬레이션하는 신중한 전략가 유형입니다. 당신의 깊은 고민은 성급한 결정으로 인한 리스크를 예방하는 중요한 안전장치가 됩니다. 남들이 보지 못하는 잠재적 위험을 발견하는 데 탁월한 능력을 가지고 있습니다.</p><p>하지만 '생각의 늪'에 빠져 행동으로 나아갈 타이밍을 놓치는 경우가 잦습니다. 실패에 대한 두려움이 과도한 분석으로 이어지기도 합니다. '완벽한 정보'는 없다는 사실을 받아들이고, 때로는 불확실성을 안고 나아가는 용기가 필요합니다.</p>", actionPlan: { details: ["생각을 멈추고 '5분만 해보자'는 생각으로 일단 시작해보세요. 관성이 붙을 거예요.", "당신의 고민을 동료에게 이야기하고, 객관적인 조언을 구해 생각의 고리를 끊어보세요.", "완벽한 계획보다 '초안'을 만든다는 가벼운 마음으로 접근해보세요."] }, compatibility: { best: "<strong>구세주 궁합: 불도저형 하고잡이  Bulldozer️</strong><br>당신이 고민하는 사이, 불도저형은 이미 저만치 앞서가며 길을 뚫어줍니다. 당신의 생각을 현실로 옮겨줄 강력한 엔진이 되어줄 거예요.", good: "<strong>의외의 궁합: 판벌이형 하고잡이 🧐</strong><br>당신의 깊은 고민이 판벌이형의 통찰력과 만나면, 누구도 생각지 못한 치밀한 전략이 탄생할 수 있습니다." } }, "할게많은형 미루잡이": { slogan: "이것도 급한데 어떡해! 중요한 건 나중에! 미루!", desc: "<p>항상 바쁘게 움직이지만 정작 중요한 일은 뒤로 미루는 경향이 있는 유형입니다. 중요하지만 어렵고 부담스러운 일 대신, 쉽고 급해 보이는 자잘한 일들을 처리하며 '바쁘다'는 만족감으로 회피하려는 심리가 숨어있습니다.</p><p>여러 일을 동시에 처리하는 멀티태스킹 능력이 있는 것처럼 보이지만, 사실은 우선순위 설정에 어려움을 겪고 있을 가능성이 높습니다. '긴급한 일'과 '중요한 일'을 구분하고, 가장 큰 영향력을 미치는 일에 에너지를 집중하는 훈련이 필요합니다.</p>", actionPlan: { details: ["오늘 할 일을 모두 적고, '가장 중요한 일' 딱 하나에만 집중해서 먼저 끝내보세요.", "동료의 부탁을 들어주기 전에, 나의 중요한 업무가 먼저인지 생각하는 습관을 들이세요.", "메신저, 이메일 등 방해 요소를 잠시 꺼두고 '집중 모드' 시간을 가져보세요."] }, compatibility: { best: "<strong>구세주 궁합: 판벌이형 하고잡이 🧐</strong><br>판벌이형은 당신이 놓치고 있는 '중요한 일'이 무엇인지, 전체적인 그림을 보며 우선순위를 정하도록 도와줍니다.", good: "<strong>의외의 궁합: 팔색조형 하고잡이 🎨</strong><br>당신이 여러 일로 허둥댈 때, 팔색조형이 곁에서 일부를 거들어주며 가장 중요한 일에 집중할 수 있도록 도와줄 수 있습니다." } }, "영혼탈출형 미루잡이": { slogan: "지금은 딴생각 시간! 재미없는 건 이따! 미루!", desc: "<p>흥미나 동기가 부족한 일을 마주하면 쉽게 집중력을 잃고 상상의 나래를 펼치는 몽상가 유형입니다. 몸은 책상 앞에 있지만, 영혼은 이미 다른 흥미로운 주제를 탐험하고 있을 때가 많습니다. 이는 때로 창의적인 아이디어의 원천이 되기도 합니다.</p><p>일상적이고 반복적인 업무에 특히 취약하며, 마감 기한이 임박해야만 비로소 집중력을 발휘하는 경향이 있습니다. 스스로에게 작은 보상을 제공하거나 업무에 게임적인 요소를 부여하는 등, '재미'를 통해 동기를 부여하는 전략이 효과적일 수 있습니다.</p>", actionPlan: { details: ["'25분 집중, 5분 휴식'의 뽀모도로 기법을 활용해 집중력을 관리해보세요.", "업무 시작 전, '이 일이 끝나면 뭘 할지' 즐거운 보상을 계획하며 동기를 부여하세요.", "지루한 업무에 '나만의 의미'나 '작은 재미'를 부여하는 게임을 해보세요."] }, compatibility: { best: "<strong>구세주 궁합: 팔색조형 하고잡이 🎨</strong><br>당신의 영혼이 탈출하려 할 때, 팔색조형이 곁에서 부드럽게 현실로 이끌어주고, 업무에 다시 흥미를 붙일 수 있도록 도와줍니다.", good: "<strong>의외의 궁합: 하고보자형 하고잡이 🚀</strong><br>당신의 엉뚱한 상상이 하고보자형을 만나면, 누구도 생각지 못한 새로운 프로젝트의 씨앗이 될 수도 있습니다." } }, "완벽주의형 미루잡이": { slogan: "이대로는 부족해! 완벽해질 때까지! 미루!", desc: "<p>결과물에 대한 기준이 매우 높아, 그 기준에 미치지 못할 것이라는 두려움 때문에 시작 자체를 미루는 유형입니다. '이왕 할 거면 제대로 해야 한다'는 생각이 강하며, 작은 흠결도 용납하지 못하는 경향이 있습니다. 이러한 성향은 결과물의 퀄리티를 높이는 데 기여합니다.</p><p>하지만 '완벽한 시작'을 추구하다가 정작 중요한 시간을 흘려보내곤 합니다. 실패에 대한 과도한 두려움이 당신의 발목을 잡고 있는 셈입니다. '완성'을 '완벽'보다 우선하는 자세를 갖고, 과정을 통해 발전해나가는 경험을 쌓는 것이 중요합니다.</p>", actionPlan: { details: ["'완성'을 목표로, 퀄리티는 60%만 채운다는 생각으로 가볍게 시작해보세요.", "나의 결과물을 동료에게 중간 공유하고 피드백을 받으며 완성도를 높여가세요.", "실수는 성장의 과정일 뿐! 작은 실패를 경험하고 극복하는 연습을 해보세요."] }, compatibility: { best: "<strong>구세주 궁합: 하고보자형 하고잡이 🚀</strong><br>당신이 망설이는 동안, 하고보자형은 '일단 해보자!'며 당신의 등을 떠밀어줍니다. 시작을 도와줄 최고의 파트너입니다.", good: "<strong>의외의 궁합: 불도저형 하고잡이</strong><br>당신의 높은 기준과 불도저형의 실행력이 만나면, 타협 없는 최고의 결과물을 가장 빠른 속도로 만들어낼 수 있습니다." } } };
-        const typeMapping = { "개척형": "불도저형 하고잡이", "실행형": "하고보자형 하고잡이", "탐구형": "판벌이형 하고잡이", "협업형": "팔색조형 하고잡이", "잠재형": "생각많은형 미루잡이", "응원형": "할게많은형 미루잡이", "아이디어형": "영혼탈출형 미루잡이", "성장형": "완벽주의형 미루잡이" };
-        
-        // ▼▼▼▼▼ 로직 변경의 핵심 부분 ▼▼▼▼▼
-        // 각 유형별 '하고잡이 DNA' 비율 범위를 정의합니다. [최소값, 최대값]
-        const percentageRanges = {
-            // 미루잡이 그룹
-            "영혼탈출형 미루잡이": [1, 15],   // 1단계
-            "할게많은형 미루잡이": [16, 30],  // 2단계
-            "생각많은형 미루잡이": [31, 40],  // 3단계
-            "완벽주의형 미루잡이": [41, 50],  // 4단계
-            // 하고잡이 그룹
-            "팔색조형 하고잡이": [51, 60],    // 5단계
-            "판벌이형 하고잡이": [61, 70],    // 6단계
-            "하고보자형 하고잡이": [71, 85],    // 7단계
-            "불도저형 하고잡이": [86, 100]    // 8단계
-        };
-        // ▲▲▲▲▲ 로직 변경의 핵심 부분 ▲▲▲▲▲
-        
-        let shuffledQuestions = []; 
-        let currentQuestionIndex = 0; 
-        const scores = { "개척형": 0, "탐구형": 0, "성장형": 0, "협업형": 0, "아이디어형": 0, "실행형": 0, "응원형": 0, "잠재형": 0 };
-        let resultRatio = {}; 
-        let finalResultType = ''; // 최종 결과 유형을 저장할 전역 변수
-        
-        function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
-        function showPage(pageId) { document.querySelectorAll('.page').forEach(page => page.classList.remove('active')); document.getElementById(pageId).classList.add('active'); window.scrollTo(0, 0); }
-        function startTest() { Object.keys(scores).forEach(key => scores[key] = 0); currentQuestionIndex = 0; shuffledQuestions = [...questions]; shuffleArray(shuffledQuestions); shuffledQuestions.forEach(q => shuffleArray(q.a)); showPage('test-page'); renderQuestion(); }
-        function restartTest() { showPage('intro-page'); }
-        function renderQuestion() { const questionBox = document.getElementById('question-box'); const answerBox = document.getElementById('answer-box'); const progress = document.getElementById('progress'); const progressPercent = (currentQuestionIndex / questions.length) * 100; progress.style.width = progressPercent + '%'; const currentQuestion = shuffledQuestions[currentQuestionIndex]; questionBox.innerHTML = `<h2>Q${currentQuestionIndex + 1}. ${currentQuestion.q}</h2>`; answerBox.innerHTML = ""; currentQuestion.a.forEach(answer => { const btn = document.createElement("button"); btn.innerText = answer.text; btn.className = 'answer-btn'; btn.onclick = () => selectAnswer(answer.score); answerBox.appendChild(btn); }); }
-        function selectAnswer(scoreType) { scores[scoreType]++; currentQuestionIndex++; if (currentQuestionIndex < questions.length) { renderQuestion(); } else { showResult(); } }
 
-        // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
-        // 여기부터 로직이 전면 수정되었습니다.
-        // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
+        // ======== 테스트 데이터 (질문 15개) ========
+        const questions = [
+            { q: "주말 아침, 눈을 떴다! 나의 첫 행동은?", a: [{ text: "바로 일어나 밀린 집안일을 시작한다", score: "실행형" }, { text: "침대와 한 몸이 되어 뒹굴거린다", score: "잠재형" }, { text: "일단 유튜브부터 켠다", score: "아이디어형" }] },
+            { q: "친구가 '요즘 뭐 새로운 거 없어?'라고 물을 때, 나는?", a: [{ text: "최근에 꽂힌 취미 얘기를 신나게 한다", score: "개척형" }, { text: "글쎄... 그냥 똑같지 뭐.", score: "잠재형" }, { text: "너는 뭐 재밌는 거 없어? 하고 되묻는다", score: "협업형" }] },
+            { q: "새로운 맛집이 생겼다는 소식을 들었다. 나는?", a: [{ text: "당장 이번 주말에 갈 약속을 잡는다", score: "실행형" }, { text: "언젠가 가봐야지 하고 지도에 저장만 해둔다", score: "탐구형" }, { text: "친구들을 태그하며 같이 가자고 글을 올린다", score: "응원형" }] },
+            { q: "방 대청소를 하려고 마음 먹었다. 나의 시작은?", a: [{ text: "가장 큰 가구부터 옮기고 시작한다", score: "개척형" }, { text: "청소 브이로그를 보며 마음의 준비를 한다", score: "아이디어형" }, { text: "일단 드러눕고 '어디부터 치우지...' 생각만 한다", score: "잠재형" }] },
+            { q: "새로운 취미를 배우고 싶을 때, 나는?", a: [{ text: "관련 장비부터 일단 지르고 본다", score: "하고보자형" }, { text: "실력이 늘었을 때의 내 모습을 상상한다", score: "성장형" }, { text: "후기, 가격, 장단점을 몇 날 며칠 비교분석한다", score: "탐구형" }] },
+            { q: "친구가 고민을 털어놓을 때, 나는?", a: [{ text: "'그랬구나' 공감하며 일단 끝까지 들어준다", score: "응원형" }, { text: "객관적인 해결책을 제시해주려고 노력한다", score: "탐구형" }, { text: "내 경험에 빗대어 조언을 해준다", score: "협업형" }] },
+            { q: "여행 계획을 짤 때 나의 역할은?", a: [{ text: "항공권, 숙소 예약을 망설임 없이 진행한다", score: "개척형" }, { text: "나는 어디든 좋아! 친구들 의견을 따른다", score: "응원형" }, { text: "숨겨진 명소, 맛집을 찾아낸다", score: "아이디어형" }] },
+            { q: "해야 할 일이 산더미일 때, 나는?", a: [{ text: "가장 쉬운 것부터 하나씩 해치운다", score: "실행형" }, { text: "스트레스 받지 않으려 잠시 다른 생각을 한다", score: "아이디어형" }, { text: "'이것만 끝내면 쉴 수 있어!'라며 스스로를 다독인다", score: "성장형" }] },
+            { q: "계획이 틀어지는 돌발상황이 발생했다!", a: [{ text: "괜찮아! 이것도 재미지! 대안을 즐겁게 찾는다", score: "응원형" }, { text: "잠시 멘붕에 빠져 아무 생각도 하지 않는다", score: "잠재형" }, { text: "왜 틀어졌는지 원인을 먼저 파악한다", score: "탐구형" }] },
+            { q: "나는 주로 어떤 방식으로 에너지를 얻나?", a: [{ text: "사람들과 어울리며 즐거운 시간을 보낸다", score: "협업형" }, { text: "혼자만의 시간을 가지며 생각을 정리한다", score: "잠재형" }, { text: "새로운 것을 배우거나 성취감을 느낄 때", score: "성장형" }] },
+            { q: "유튜브를 볼 때 나는 주로?", a: [{ text: "알고리즘이 이끄는 대로 의식의 흐름에 맡긴다", score: "아이디어형" }, { text: "구독 채널의 새 영상만 확인하고 끈다", score: "실행형" }, { text: "하나의 주제를 정해 관련 영상을 파고든다", score: "탐구형" }] },
+            { q: "새로운 사람을 만나는 자리에 나갔을 때, 나는?", a: [{ text: "먼저 말을 걸며 분위기를 주도한다", score: "개척형" }, { text: "다른 사람들이 무슨 말을 하는지 조용히 듣는다", score: "잠재형" }, { text: "리액션을 잘 해주며 대화에 참여한다", score: "응원형" }] },
+            { q: "나에게 '휴식'이란?", a: [{ text: "아무것도 하지 않고 멍때리는 것", score: "잠재형" }, { text: "평소 하고 싶었던 활동적인 무언가를 하는 것", score: "실행형" }, { text: "더 나은 내일을 위해 재충전하는 시간", score: "성장형" }] },
+            { q: "친구가 '이거 같이 하자!'라고 제안했을 때, 나는?", a: [{ text: "재밌겠다! 바로 '콜!'을 외친다", score: "협업형" }, { text: "일단 생각해본다고 말한 뒤 신중하게 결정한다", score: "탐구형" }, { text: "거기에 내 아이디어를 더해 더 재밌게 만들자고 한다", score: "아이디어형" }] },
+            { q: "목표를 세울 때 나는?", a: [{ text: "실현 가능한 작은 목표부터 차근차근 세운다", score: "성장형" }, { text: "가슴 뛰는 원대한 목표를 세운다", score: "개척형" }, { text: "다른 사람들은 어떤 목표를 세우는지 먼저 본다", score: "협업형" }] }
+        ];
+
+        // ================== 결과 데이터 (궁합 정보 추가) ==================
+        const resultData = {
+            "직진불도저형 하고잡이": {
+                slogan: "생각은 짧게, 실행은 즉시! 고민할 시간에 일단 GO! 하고!",
+                desc: "<p>강력한 추진력으로 생각한 것을 바로 행동으로 옮기는 당신은 그룹의 '인간 엔진'입니다. 약속 잡기, 맛집 예약 등 총대를 메는 것에 망설임이 없으며, 당신의 시원시원한 행동력은 모두에게 속도감을 불어넣습니다.</p><p>하지만 가끔은 너무 빠른 속도에 주변을 둘러보지 못하고 지나칠 때도 있어요. 모두의 의견을 듣기 전 이미 결제가 완료되어 있진 않나요? 가끔은 '일시정지' 버튼을 누르고 주변의 풍경을 감상하는 여유가 당신의 여정을 더 풍요롭게 할 거예요.</p>",
+                actionPlan: { details: ["고민만 하던 운동, 지금 당장 스쿼트 10개부터 시작하기", "친구와 약속 잡을 때, '뭐 먹을래?' 질문 후 3분 기다려주기", "새로운 프로젝트 시작 전, '왜?'라는 질문을 스스로에게 던져보기", "떠오른 아이디어를 24시간 안에 딱 한 가지라도 실행으로 옮기기", "1시간 안에 여행 계획 짜고 바로 예약하기", "책상 위에서 가장 거슬리는 것 딱 하나만 지금 치우기", "친구에게 전화해서 '보고싶다'고 말하기", "하고 싶은 일 리스트를 만들고 가장 쉬운 것부터 해보기", "오늘 점심 메뉴는 10초 안에 결정하기", "복잡한 문제에 부딪혔을 때, 가장 단순한 해결책부터 시도하기", "다른 사람의 의견에 '일단 해보자!'고 긍정적으로 답해주기", "평소에 가보지 않았던 길로 산책하기", "SNS에 오늘 한 일을 딱 한 문장으로 요약해서 올리기", "나의 빠른 실행력을 칭찬해주기", "내일 할 일 중 하나를 오늘 미리 해버리기"]},
+                animal: "🦏 돌진하는 코뿔소",
+                activationSwitch: "명확한 목표가 눈앞에 나타났을 때",
+                compatibility: { best: "<strong>환상의 궁합: 끝장탐구형 하고잡이 🧐</strong><br>당신이 뚫어놓은 길을 끝장탐구형이 탄탄하게 다져주며 최고의 시너지를 냅니다. 속도와 방향, 두 마리 토끼를 모두 잡는 조합입니다.", good: "<strong>의외의 꿀조합: 뇌절분석형 미루잡이 🤔</strong><br>당신이 놓칠 수 있는 디테일과 리스크를 뇌절분석형이 꼼꼼히 짚어줍니다. 당신의 실행력에 안정성을 더해주는 고마운 존재입니다." }
+            },
+            "일단지름형 하고잡이": {
+                slogan: "재밌어 보이면 일단 장비부터! 장바구니는 나의 놀이터! 하고!",
+                desc: "<p>호기심이 왕성해 '일단 해보자!'를 외치는 긍정적인 탐험가입니다. '이거 재밌겠다' 싶으면 장비 구매, 원데이 클래스 등록까지 일사천리로 진행하죠. 당신의 도전은 주변 사람들에게도 신선한 영감을 줍니다.</p><p>하지만 다양한 경험치를 쌓는 만큼, 하나의 스킬을 마스터하기 전에 새로운 관심사가 생기기도 해요. 여러 게임을 동시에 하는 것처럼요! 작은 것이라도 '엔딩'까지 보는 경험이 당신에게 새로운 종류의 성취감을 줄 거예요.</p>",
+                actionPlan: { details: ["찜해둔 맛집 리스트 중, 이번 주말에 갈 한 곳 정해서 꼭 가보기", "유튜브 프리미엄 3개월 무료체험, 이번엔 까먹지 말고 끝까지 써보기", "나의 도전을 응원해 줄 친구에게 '나 이거 시작했다!'고 선포하기", "장바구니에 담아둔 물건 중, 가장 오래된 것 하나를 결제하거나 삭제하기", "새로 산 장비나 책을 오늘 딱 10분만 사용해보기", "원데이 클래스를 들었다면, 배운 내용을 활용해 작은 결과물 만들어보기", "시작만 하고 방치해둔 게임/드라마/책 중 하나를 정해 '1단계 클리어' 또는 '1챕터 읽기' 달성하기", "나의 '일단지름' 리스트를 만들고 가장 만족스러웠던 경험 공유하기", "친구의 새로운 도전에 '멋지다!'고 말해주기", "관심 분야 유튜버에게 응원 댓글 달기", "한 번도 안 먹어본 음료수 마셔보기", "새로운 기술을 배우기보다, 이미 아는 기술을 더 잘하게 연마해보기", "나의 '용두사미' 경험을 유머러스하게 친구에게 이야기하기", "하나를 끝냈을 때 스스로에게 '수고했어!' 소리내어 칭찬하기", "관심사 커뮤니티에 가입해서 눈팅만이라도 해보기"]},
+                animal: "🦦 뭐든 일단 맛보는 수달",
+                activationSwitch: "새롭고 반짝이는 무언가를 발견했을 때",
+                compatibility: { best: "<strong>환상의 궁합: 분위기메이커형 하고잡이 🎨</strong><br>당신이 새로운 판을 벌일 때마다 분위기메이커형은 찰떡같이 역할을 소화하며 든든한 지원군이 되어줍니다. 함께라면 뭐든 유쾌한 도전이 됩니다.", good: "<strong>의외의 꿀조합: 과몰입완벽형 미루잡이 ✍️</strong><br>당신의 빠른 실행력에 완벽주의자의 꼼꼼함이 더해져 결과물의 퀄리티를 수직 상승시킵니다. 시작과 마무리 모두 완벽한 조합!" }
+            },
+            "끝장탐구형 하고잡이": {
+                slogan: "이왕 할 거면, 제대로 파야지. 뿌리까지 뽑아버리겠어. 하고!",
+                desc: "<p>어떤 일이든 '대충'은 없습니다. 취미 하나를 시작해도 논문 쓰듯 파고들어야 직성이 풀리며, 여행을 가도 그 지역의 숨겨진 이야기까지 알아내야 만족하는 딥다이버(Deep-diver)입니다. 당신의 깊이 있는 지식은 대화를 풍요롭게 만듭니다.</p><p>하지만 때로는 너무 깊게 파고든 나머지, 시작이 늦어지거나 '즐기는 마음'을 잃어버릴 수 있어요. 가끔은 완벽한 공략집 없이, 맨몸으로 부딪히며 즉흥적인 즐거움을 느껴보는 건 어떨까요?</p>",
+                actionPlan: { details: ["요즘 꽂힌 주제에 대해 30분 동안 '나무위키' 정독하기", "내가 잘 아는 분야의 지식을 친구에게 쉽고 재밌게 설명해주기", "여행 계획 짤 때, 하루쯤은 '자유시간'으로 비워두고 발길 닿는 대로 움직여보기", "관심 주제에 대한 다큐멘터리 한 편 보기", "정보 탐색 시간을 1시간으로 제한하고, 그 안에 얻은 정보만으로 행동 결정하기", "나의 '탐구 노트'를 만들고 핵심만 요약하는 연습하기", "복잡한 정보를 다른 사람에게 설명해주며 내 지식을 점검하기", "가끔은 '왜?'라고 묻지 않고 그냥 즐겨보기", "서점에 가서 전혀 관심 없던 분야의 책 제목 훑어보기", "내 전문 분야와 전혀 다른 분야의 사람과 대화해보기", "탐구 활동 중간에 일부러 휴식 시간을 갖고 뇌를 쉬게 해주기", "결론을 내리지 않고, 열린 질문을 간직한 채 하루 보내보기", "나의 탐구력을 긍정적인 방향(남 돕기, 문제 해결)으로 사용하기", "가장 좋아하는 주제에 대해 '덕질'하듯 깊게 파고 즐기기", "정보의 '양'보다 '질'에 집중하는 연습하기"]},
+                animal: "🦉 밤새 먹이를 연구하는 부엉이",
+                activationSwitch: "풀리지 않는 궁금증이나 미스터리를 마주했을 때",
+                compatibility: { best: "<strong>환상의 궁합: 직진불도저형 하고잡이 🔥</strong><br>당신이 깊이 파고들어 제시한 최적의 루트를 직진불도저형이 거침없이 질주합니다. 전략과 실행의 완벽한 하모니를 보여줍니다.", good: "<strong>의외의 꿀조합: 갓생흉내형 미루잡이 🏃‍♀️</strong><br>당신이 한 우물을 깊게 팔 때, 갓생흉내형은 주변의 자잘하지만 급한 불들을 꺼주며 당신이 집중할 최적의 환경을 만들어줍니다." }
+            },
+            "분위기메이커형 하고잡이": {
+                slogan: "네가 좋으면 나도 좋아! 같이 하면 더 재밌잖아! 하고!",
+                desc: "<p>친구들 사이에서 분위기를 맞추고 모두가 즐겁도록 돕는 다정한 '인간 스위스칼'입니다. 내 의견을 강하게 주장하기보다, 그룹의 조화를 중요하게 생각하며 기꺼이 궂은일도 마다하지 않는 당신은 어딜 가나 사랑받는 존재입니다.</p><p>하지만 모두를 챙기느라 정작 '내가 진짜 원하는 것'을 놓치기 쉬워요. 모두의 플레이리스트를 챙기는 것도 좋지만, 가끔은 오롯이 나만을 위한 노래를 1순위로 재생해보세요.</p>",
+                actionPlan: { details: ["친구들과 메뉴 정할 때, 이번만큼은 내가 먹고 싶은 걸로 강력하게 밀어붙여보기", "모두를 위한 계획 대신, 오롯이 나를 위한 '나홀로 데이'를 계획하고 실천해보기", "도움이 필요한 친구에게 해결책 제시보다 '너 요즘 많이 힘들지?' 따뜻한 말 한마디 건네기", "거절이 필요할 땐 '미안하지만...'이라고 솔직하게 말하는 연습하기", "단체 활동에서 잠시 빠져 혼자만의 시간 10분 갖기", "내가 진짜 하고 싶은 것 3가지를 핸드폰 메모장에 적어보기", "다른 사람 칭찬하기 전에, 오늘 내가 잘한 일 먼저 칭찬하기", "모임에서 일부러 침묵하며 다른 사람들이 대화를 이끌게 둬보기", "나의 의견을 말할 때 '내 생각에는~'이라는 말을 앞에 붙여보기", "나를 위한 작은 선물 사기", "다른 사람의 부탁을 들어주기 전, '내가 할 여유가 있나?' 3초만 생각하기", "나의 감정을 솔직하게 표현하는 연습하기 (예: 나 지금 좀 서운해)", "모든 사람을 만족시킬 수 없다는 사실을 받아들이기", "가끔은 이기적이어도 괜찮다고 스스로에게 말해주기", "내가 주도해서 모임을 계획하고 이끌어보기"]},
+                animal: "🐶 무리를 이끄는 골든 리트리버",
+                activationSwitch: "좋아하는 사람들이 함께 웃고 즐거워할 때",
+                compatibility: { best: "<strong>환상의 궁합: 일단지름형 하고잡이 🚀</strong><br>새로운 도전을 즐기는 일단지름형에게 당신의 유연함과 서포트는 천군만마와 같습니다. 어떤 상황에서도 믿고 맡길 수 있는 최고의 파티원입니다.", good: "<strong>의외의 꿀조합: 영혼가출형 미루잡이 💭</strong><br>딴생각에 빠진 영혼가출형을 부드럽게 현실로 이끌어주고, 그는 당신에게 예상치 못한 창의적인 영감을 선물하는 상부상조 조합입니다." }
+            },
+            "뇌절분석형 미루잡이": {
+                slogan: "혹시 모르니까... 경우의 수 한번만 더 따져보고... 미루!",
+                desc: "<p>행동하기 전, 발생 가능한 모든 경우의 수를 시뮬레이션하는 신중한 전략가입니다. 당신의 신중함 덕분에 큰 실수를 피할 수 있지만, '생각의 늪'에 빠져 시작할 타이밍을 놓치는 경우가 많습니다. 여행 계획을 짜다 지쳐 결국 랜선 여행으로 만족하는 유형이죠.</p><p>'완벽한 준비'는 없다는 사실을 인정하고, 80%만 준비되어도 괜찮다는 용기가 필요해요. '일단 저지르고 보자'는 친구와 함께하면 최고의 시너지를 낼 수 있습니다.</p>",
+                actionPlan: { details: ["고민만 하던 일, '5분만 해보자'는 생각으로 타이머 맞추고 딱 5분만 실행하기", "결정이 어려울 때, 생각을 멈추고 동전 던지기로 결정해보는 과감함 발휘하기", "나의 고민을 친구에게 털어놓고 '그래서 넌 어떻게 할 건데?'라는 질문 받아보기", "선택지가 너무 많을 땐, 가장 마음에 들지 않는 것부터 지워나가기", "'최악의 경우'만 생각하지 말고, '최고의 경우'도 상상해보기", "생각이 너무 많아질 땐, 산책이나 운동으로 잠시 뇌를 비워주기", "결정에 필요한 정보를 모으는 시간을 30분으로 제한하기", "작은 결정은 1분 안에 내리는 연습하기 (예: 점심 메뉴, 볼 영화)", "나의 분석이 팀에 도움이 되었던 긍정적 경험을 떠올리기", "모든 것을 통제할 수 없다는 사실을 받아들이기", "'실수해도 괜찮아, 배우면 돼'라고 스스로에게 말해주기", "계획을 세울 때 '만약'을 대비한 플랜 B까지만 짜기 (플랜 C, D는 금지!)", "나의 신중함을 '리스크 관리 능력'이라는 강점으로 인식하기", "고민의 과정을 노트에 적어보면, 의외로 답이 간단할 수 있다는 걸 깨닫기", "생각을 멈추고 몸을 먼저 움직여보기 (예: 일단 일어나서 물 한 잔 마시기)"]},
+                animal: "🤔 돌다리도 두들겨보는 미어캣",
+                activationSwitch: "행동의 결과가 100% 예측 가능하다고 느낄 때",
+                compatibility: { best: "<strong>구세주 궁합: 직진불도저형 하고잡이 🔥</strong><br>당신이 '뇌정지...' 상태일 때, 직진불도저형은 이미 저만치 앞서가며 길을 뚫어줍니다. 생각을 현실로 만들어 줄 강력한 '실행' 버튼이 되어줄 거예요.", good: "<strong>의외의 꿀조합: 끝장탐구형 하고잡이 🧐</strong><br>당신의 깊은 고민이 끝장탐구형의 통찰력과 만나면, 누구도 생각지 못한 치밀하고 완성도 높은 계획이 탄생할 수 있습니다." }
+            },
+            "갓생흉내형 미루잡이": {
+                slogan: "아, 이것도 해야 하는데! 미루! (일단 방청소부터...)",
+                desc: "<p>항상 바쁘게 무언가를 하고 있지만, 정작 가장 중요하고 큰일은 뒤로 미루는 경향이 있습니다. 시험 기간에 갑자기 책상 정리가 하고 싶어지는 것처럼, 부담스러운 과제 대신 쉽고 자잘한 일들을 처리하며 '나름 열심히 살았다'는 안도감을 느끼는 유형입니다.</p><p>'급한 일'과 '중요한 일'을 구분하는 연습이 필요해요. 오늘 해야 할 가장 중요한 일 딱 하나를 정해, 그것부터 끝내는 습관이 당신의 '갓생'을 완성시켜 줄 것입니다.</p>",
+                actionPlan: { details: ["오늘 할 일을 모두 적고, 가장 중요하지만 하기 싫은 일에 별표 치고 가장 먼저 해치우기", "30분 동안 스마트폰 알림 끄고, 온전히 한 가지 일에만 집중하는 '집중 모드' 가져보기", "하기 싫은 일을 끝냈을 때, 나에게 줄 '작은 보상'(예: 최애 아이스크림)을 미리 정해두기", "중요한 일을 아주 작은 단계로 쪼개기 (예: '레포트 쓰기' -> '참고문헌 찾기')", "가짜로 바쁜 내 모습을 알아차리고, 잠시 멈춰 '진짜 해야 할 일이 뭐지?' 묻기", "책상 정리가 하고 싶어지면, '이거 5분만 하고 진짜 공부한다!'고 스스로와 약속하기", "To-do 리스트 대신 '하지 않을 일(Not-to-do)' 리스트를 만들어보기", "'완벽하게'가 아니라 '끝내기만 하자'는 마음으로 시작하기", "내가 미루는 습관을 친구에게 고백하고, 서로 감시해주기", "중요한 일을 시작하기 전에 '나는 할 수 있다'고 3번 외치기", "일의 우선순위를 정하는 '아이젠하워 매트릭스' 방법 써보기", "나의 에너지가 가장 높은 시간에 중요한 일을 배치하기", "미루고 싶은 마음이 들 때, 그 감정을 인정하고 5분만 쉬기", "작은 성공(예: 이메일 1개 답장)도 성공 리스트에 적으며 성취감 느끼기", "오늘 가장 중요한 일 하나만 끝내도 '갓생'이라고 인정해주기"]},
+                animal: "🐿️ 중요한 도토리는 숨겨두고 잔가지부터 모으는 다람쥐",
+                activationSwitch: "체크리스트에 있는 사소한 항목들을 지워나갈 때",
+                compatibility: { best: "<strong>구세주 궁합: 끝장탐구형 하고잡이 🧐</strong><br>끝장탐구형은 당신이 놓치고 있는 '진짜 중요한 일'이 무엇인지, 전체적인 그림을 보며 우선순위를 정하도록 도와주는 인간 네비게이션입니다.", good: "<strong>의외의 꿀조합: 분위기메이커형 하고잡이 🎨</strong><br>당신이 여러 일로 허둥댈 때, 분위기메이커형이 곁에서 자잘한 일을 거들어주며 가장 중요한 일에 집중할 수 있도록 도와줍니다." }
+            },
+            "영혼가출형 미루잡이": {
+                slogan: "아, 맞다! 그거 해야 하는데... 미루! (뇌내 BGM 자동재생)",
+                desc: "<p>지루하거나 흥미 없는 일을 마주하면 쉽게 집중력을 잃고 상상의 나래를 펼치는 몽상가입니다. 몸은 책상 앞에 있지만, 영혼은 이미 주말 여행, 어제 본 드라마 다음 편을 그리고 있죠. 이는 때로 누구도 생각 못한 창의적인 아이디어의 원천이 되기도 합니다.</p><p>마감 기한이 임박해야만 초인적인 집중력을 발휘하는 '벼락치기 전문가'일 가능성이 높습니다. 지루한 일에 게임처럼 퀘스트를 부여하는 등 '재미'를 통해 동기를 부여하는 전략이 효과적입니다.</p>",
+                actionPlan: { details: ["'25분 집중, 5분 휴식'의 뽀모도로 기법 활용해보기", "지루한 일을 시작하기 전, '이거 끝내고 유튜브 1시간 보기!'처럼 즐거운 보상 계획하기", "해야 할 일을 잊지 않도록 스마트폰 잠금화면에 메모해두기", "상상의 나래를 펼치는 나를 발견하면, '다녀왔니?'하고 웃어주기", "멍때리는 시간을 '창의력 충전 시간'으로 정해놓고 당당하게 즐기기", "지루한 과제에 나만의 재미있는 규칙 만들기 (예: 한 페이지 끝낼 때마다 간식 먹기)", "마감 기한을 일부러 하루 이틀 앞으로 당겨서 설정하기", "주변 소음을 막아줄 백색소음이나 좋아하는 플레이리스트 활용하기", "창의적인 아이디어가 떠오르면 즉시 메모하는 습관 갖기", "몸을 움직이면 잠자는 뇌가 깨어난다! 5분간 스트레칭하기", "친구나 동료와 함께 공부하거나 일하며 서로 감시해주기", "해야 할 일을 '레벨 1 퀘스트', '보스몹 잡기' 등 게임처럼 표현해보기", "나의 벼락치기 능력을 믿되, 너무 자주 사용하지는 않기", "집중이 안 될 땐, 장소를 바꿔보는 것도 좋은 방법 (예: 카페, 도서관)", "오늘 할 일 딱 3가지만 정하고, 나머지는 과감히 내일로 미루기"]},
+                animal: "🐈 창밖을 보며 사색에 잠긴 고양이",
+                activationSwitch: "마감이 코앞으로 다가와 더 이상 물러설 곳이 없을 때",
+                compatibility: { best: "<strong>구세주 궁합: 분위기메이커형 하고잡이 🎨</strong><br>당신의 영혼이 탈출하려 할 때, 분위기메이커형이 곁에서 부드럽게 현실로 붙잡아주고 일에 다시 흥미를 붙이도록 도와줍니다.", good: "<strong>의외의 꿀조합: 일단지름형 하고잡이 🚀</strong><br>당신의 엉뚱한 상상이 일단지름형을 만나면, '그거 재밌겠다!'며 누구도 생각지 못한 기상천외한 프로젝트로 발전할 수 있습니다." }
+            },
+            "과몰입완벽형 미루잡이": {
+                slogan: "이대로는 부족해... 완벽해질 때까지 제출할 수 없어. 미루!",
+                desc: "<p>결과물에 대한 기준이 매우 높아, 그 기준에 미치지 못할 것이라는 두려움 때문에 시작 자체를 망설이는 유형입니다. '이왕 할 거면 제대로'라는 생각에 사소한 흠결도 용납하지 못하죠. 이런 성향은 종종 높은 퀄리티의 결과물로 이어지지만, 과정에서 쉽게 지치기도 합니다.</p><p>'완벽한 시작'을 기다리다 소중한 시간을 흘려보내곤 해요. '완벽'보다 '완성'을 목표로, 과정을 통해 발전해나가는 경험이 중요합니다. 당신의 60%짜리 초안은 남들의 100%보다 나을 수 있어요!</p>",
+                actionPlan: { details: ["'초안'일 뿐이라고 되뇌며, 퀄리티는 60%만 채운다는 가벼운 마음으로 시작하기", "나의 결과물을 친구에게 중간 공유하고 '이 정도면 괜찮아?' 피드백 받으며 자신감 얻기", "실수는 성장의 과정일 뿐! 작은 실패를 두려워하지 않는 연습하기", "'완성'을 목표로, 마감 기한을 정하고 무슨 일이 있어도 지키기", "나의 작업물을 일부러 흠 잡으려는 사람보다, 응원해주는 사람에게 보여주기", "내가 존경하는 사람도 처음부터 완벽하지 않았다는 사실을 기억하기", "시작하기 두려울 땐, 가장 쉬운 부분부터 딱 15분만 해보기", "나의 기준을 잠시 내려놓고, 다른 사람의 '이만하면 됐다'는 말을 믿어보기", "과거에 내가 '완벽하지 않지만 잘 끝낸' 성공 경험을 떠올리기", "과정에 대한 스트레스가 심할 땐, 잠시 쉬거나 다른 활동으로 기분 전환하기", "'완벽주의'가 나를 방해하고 있다는 사실을 인정하기", "스스로에게 '이 정도면 충분히 잘했어'라고 말해주는 연습하기", "다른 사람의 결과물을 보고 '나도 저 정도는 할 수 있겠다'는 자신감 얻기", "작업 과정을 기록하며 내가 얼마나 발전했는지 눈으로 확인하기", "최고가 아니어도 괜찮다는 사실을 받아들이기, '최선'이면 충분하다!"]},
+                animal: "🦚 깃털 하나하나 완벽해야 외출하는 공작",
+                activationSwitch: "내 안의 '완벽' 기준에 딱 맞는 계획이 세워졌을 때",
+                compatibility: { best: "<strong>구세주 궁합: 일단지름형 하고잡이 🚀</strong><br>당신이 망설이는 동안, 일단지름형은 '일단 해보자!'며 당신의 등을 떠밀어줍니다. 시작을 도와줄 최고의 페이스메이커입니다.", good: "<strong>의외의 꿀조합: 직진불도저형 하고잡이 🔥</strong><br>당신의 높은 기준과 직진불도저형의 실행력이 만나면, 타협 없는 최고의 결과물을 가장 빠른 속도로 만들어내는 '어벤져스' 조합이 될 수 있습니다." }
+            }
+        };
+
+        const typeMapping = { 
+            "개척형": "직진불도저형 하고잡이", 
+            "실행형": "일단지름형 하고잡이", 
+            "탐구형": "끝장탐구형 하고잡이", 
+            "협업형": "분위기메이커형 하고잡이", 
+            "잠재형": "뇌절분석형 미루잡이", 
+            "응원형": "갓생흉내형 미루잡이", 
+            "아이디어형": "영혼가출형 미루잡이", 
+            "성장형": "과몰입완벽형 미루잡이" 
+        };
+        
+        const percentageRanges = {
+            "영혼가출형 미루잡이": [1, 15], 
+            "갓생흉내형 미루잡이": [16, 30], 
+            "뇌절분석형 미루잡이": [31, 40], 
+            "과몰입완벽형 미루잡이": [41, 50],
+            "분위기메이커형 하고잡이": [51, 60], 
+            "끝장탐구형 하고잡이": [61, 70], 
+            "일단지름형 하고잡이": [71, 85], 
+            "직진불도저형 하고잡이": [86, 100]
+        };
+        
+        // ======== 테스트 변수 ========
+        let shuffledQuestions = [];
+        let currentQuestionIndex = 0;
+        const scores = { "개척형": 0, "탐구형": 0, "성장형": 0, "협업형": 0, "아이디어형": 0, "실행형": 0, "응원형": 0, "잠재형": 0, "하고보자형": 0 };
+        let finalResultType = '';
+        let answerHistory = [];
+        
+        // ======== 핵심 함수들 ========
+        function shuffleArray(array) { 
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) { 
+                const j = Math.floor(Math.random() * (i + 1)); 
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]]; 
+            } 
+            return newArray; 
+        }
+
+        function showPage(pageId) { 
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active')); 
+            document.getElementById(pageId).classList.add('active'); 
+            window.scrollTo(0, 0); 
+        }
+        
+        function startTest() { 
+            Object.keys(scores).forEach(key => scores[key] = 0); 
+            currentQuestionIndex = 0; 
+            answerHistory = []; 
+            shuffledQuestions = shuffleArray([...questions]);
+            shuffledQuestions.forEach(q => q.a = shuffleArray(q.a));
+            renderQuestion();
+            showPage('test-page'); 
+        }
+
+        function restartTest() { 
+            showPage('intro-page'); 
+        }
+        
+        function renderQuestion() { 
+            const questionBox = document.getElementById('question-box'); 
+            const answerBox = document.getElementById('answer-box'); 
+            const progress = document.getElementById('progress'); 
+            const backBtn = document.getElementById('back-btn');
+            
+            progress.style.width = (currentQuestionIndex / questions.length) * 100 + '%'; 
+            
+            const currentQuestion = shuffledQuestions[currentQuestionIndex]; 
+            questionBox.innerHTML = `<h2>Q${currentQuestionIndex + 1}. ${currentQuestion.q}</h2>`; 
+            answerBox.innerHTML = ""; 
+            
+            currentQuestion.a.forEach(answer => { 
+                const btn = document.createElement("button"); 
+                btn.innerText = answer.text; 
+                btn.className = 'answer-btn'; 
+                btn.onclick = () => selectAnswer(answer.score); 
+                answerBox.appendChild(btn); 
+            });
+
+            if (currentQuestionIndex > 0) {
+                backBtn.style.display = 'inline-block';
+            } else {
+                backBtn.style.display = 'none';
+            }
+        }
+        
+        function selectAnswer(scoreType) { 
+            scores[scoreType]++; 
+            answerHistory.push(scoreType);
+            currentQuestionIndex++; 
+            if (currentQuestionIndex < questions.length) { 
+                renderQuestion(); 
+            } else { 
+                showResult(); 
+            } 
+        }
+
+        function goBack() {
+            if (currentQuestionIndex === 0) return;
+
+            currentQuestionIndex--;
+            const lastAnswer = answerHistory.pop();
+            scores[lastAnswer]--;
+            renderQuestion();
+        }
+
         function showResult() {
             const resultContainer = document.getElementById('result-container');
-            
-            // 1. 점수가 가장 높은 기초 성향을 찾아 최종 유형 결정
-            const sortedScores = Object.entries(scores).sort((a, b) => b[1] - a[1]);
-            const topBaseType = sortedScores[0][0]; // 가장 점수 높은 기초 성향 (예: '개척형')
-            finalResultType = typeMapping[topBaseType]; // 최종 유형 (예: '불도저형 하고잡이')
-            
-            // 2. 결정된 최종 유형에 맞는 비율 범위를 가져옴
-            const range = percentageRanges[finalResultType];
-            if (!range) {
-                console.error("오류: 유형에 대한 비율 범위를 찾을 수 없습니다:", finalResultType);
-                // 오류 발생 시 기본값으로 처리
-                const [min, max] = [45, 55];
-            }
-            const [min, max] = range;
+            const tempScores = { ...scores }; 
 
-            // 3. 해당 범위 내에서 무작위 퍼센트 생성
+            if(tempScores['하고보자형'] > 0) {
+                tempScores['실행형'] += tempScores['하고보자형'];
+            }
+            delete tempScores['하고보자형']; 
+
+            const sortedScores = Object.entries(tempScores).sort((a, b) => b[1] - a[1]);
+            const topBaseType = sortedScores[0][0];
+
+            finalResultType = typeMapping[topBaseType];
+            
+            const range = percentageRanges[finalResultType] || [45, 55];
+            const [min, max] = range;
             const hagojabiPercent = Math.floor(Math.random() * (max - min + 1)) + min;
             const mirujabiPercent = 100 - hagojabiPercent;
 
-            // 4. 나중에 submit 할 때 사용하기 위해 전역 변수에 저장
-            resultRatio = { hagojabi: hagojabiPercent, mirujabi: mirujabiPercent };
-
-            // 5. 결과 HTML 생성
-            const typeInfo = newResultData[finalResultType];
-            const allSuggestions = [...typeInfo.actionPlan.details];
-            const selectedSuggestions = shuffleArray(allSuggestions).slice(0, 3);
+            const typeInfo = resultData[finalResultType];
             
-            let resultHTML = `<h2>당신은 <strong>${finalResultType}!</strong></h2><p class="result-slogan">${typeInfo.slogan}</p><div class="result-section"><h3>내 안의 DNA 비율</h3><div class="dna-graph-container"><div class="dna-graph-label"><span class="hagojabi-label">🧬 하고잡이 DNA</span><span class="mirujabi-label">🐌 미루잡이 DNA</span></div><div class="dna-graph-bar"><div class="hagojabi-bar" style="width: 0%;" data-percent="${hagojabiPercent}">${hagojabiPercent}%</div><div class="mirujabi-bar" style="width: 0%;" data-percent="${mirujabiPercent}">${mirujabiPercent}%</div></div></div></div><div class="result-section"><h3>✨ 나의 DNA 특성</h3><div class="result-type-desc">${typeInfo.desc}</div></div><div class="result-section"><h3>🚀 실천 제안</h3><ul>${selectedSuggestions.map(detail => `<li>${detail}</li>`).join('')}</ul></div><div class="result-section"><h3>🤝 케미 궁합</h3><p>${typeInfo.compatibility.best}</p><p>${typeInfo.compatibility.good}</p></div>`;
+            const randomActionPlans = shuffleArray(typeInfo.actionPlan.details).slice(0, 3);
+            
+            const resultHTML = `
+                <h2>당신은 <strong>${finalResultType}!</strong></h2>
+                <p class="result-slogan">${typeInfo.slogan}</p>
+                <div class="result-section">
+                    <h3>내 안의 DNA 비율</h3>
+                    <div class="dna-graph-container">
+                        <div class="dna-graph-label">
+                            <span class="hagojabi-label">🧬 하고잡이 DNA</span>
+                            <span class="mirujabi-label">🐌 미루잡이 DNA</span>
+                        </div>
+                        <div class="dna-graph-bar">
+                            <div class="hagojabi-bar" style="width: 0%;" data-percent="${hagojabiPercent}">${hagojabiPercent}%</div>
+                            <div class="mirujabi-bar" style="width: 0%;" data-percent="${mirujabiPercent}">${mirujabiPercent}%</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="result-section">
+                    <h3>✨ 나의 DNA 특성</h3>
+                    <div class="result-type-desc">${typeInfo.desc}</div>
+                    <div class="dna-extra-container">
+                        <div class="dna-extra-item">
+                            <h4>⚡️ DNA 활성 스위치</h4>
+                            <p>${typeInfo.activationSwitch}</p>
+                        </div>
+                        <div class="dna-extra-item">
+                            <h4>💖 당신과 닮은 동물</h4>
+                            <p>${typeInfo.animal}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="result-section">
+                    <h3>🚀 실천 제안</h3>
+                    <ul>${randomActionPlans.map(detail => `<li>${detail}</li>`).join('')}</ul>
+                </div>
+                <div class="result-section">
+                    <h3>🤝 어쩜 우린...? (환상의 궁합)</h3>
+                    <p>${typeInfo.compatibility.best}</p>
+                    <p>${typeInfo.compatibility.good}</p>
+                </div>`;
             resultContainer.innerHTML = resultHTML;
             showPage('result-page');
 
-            // 그래프 애니메이션
             setTimeout(() => {
                 document.querySelector('.hagojabi-bar').style.width = `${hagojabiPercent}%`;
                 document.querySelector('.mirujabi-bar').style.width = `${mirujabiPercent}%`;
             }, 100);
         }
-        // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
-        // 여기까지 로직이 전면 수정되었습니다.
-        // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+        
+        async function shareResult() {
+            try {
+                await navigator.share({
+                    title: '하고잡이 & 미루잡이 DNA 테스트',
+                    text: `내 안의 하고잡이 DNA는 몇 %? 나의 결과(${finalResultType})가 궁금하다면?`,
+                    url: window.location.href
+                });
+            } catch (err) {
+                await navigator.clipboard.writeText(window.location.href);
+                alert('링크가 클립보드에 복사되었습니다. 원하는 곳에 붙여넣어 공유해주세요!');
+            }
+        }
 
-        function submitResult() {
-            const promptMessage = `당신의 하고잡이 성향, 동료들과의 케미 매칭을 위해 '부서/이름'형식으로 입력해 주세요. (예: 인사팀/홍길동)\n\n입력해주신 정보는 내부 콘텐츠 제작과 케미 매칭 목적으로만 활용 됩니다.`;
-            const userInput = prompt(promptMessage);
-            if (!userInput) { alert("입력이 없어 제출이 취소되었습니다."); return; }
-            const parts = userInput.split('/');
-            if (parts.length !== 2 || !parts[0].trim() || !parts[1].trim()) { alert("'부서/이름' 형식이 올바르지 않습니다. 다시 시도해주세요."); return; }
-            const department = parts[0].trim();
-            const name = parts[1].trim();
+        function captureResult() {
+            const btn = document.getElementById('captureBtn');
+            btn.disabled = true;
+            btn.innerText = "저장 중...";
             
-            // showResult에서 계산된 최종 유형과 비율을 그대로 사용합니다.
-            const type = finalResultType;
-            const ratioText = `하고잡이 ${resultRatio.hagojabi}% : 미루잡이 ${resultRatio.mirujabi}%`;
-
-            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxyv5abwBMTEEu3FAzmktiFB_admPw4T0AACIwLDdTsXhkV0DFWD9Jx8e1YLcgDYNo/exec";
-            if (SCRIPT_URL.includes("여기에")) { alert("오류: 스크립트 URL이 설정되지 않았습니다."); return; }
+            const captureArea = document.getElementById('result-page');
             
-            const formData = new FormData();
-            formData.append('department', department);
-            formData.append('name', name);
-            formData.append('type', type);
-            formData.append('ratio', ratioText);
-            formData.append('timestamp', new Date().toLocaleString('ko-KR'));
-
-            const submitButton = document.getElementById('submitBtn');
-            submitButton.disabled = true;
-            submitButton.innerText = "제출 중...";
-            
-            fetch(SCRIPT_URL, { method: "POST", body: formData, mode: 'no-cors' })
-            .then(() => { alert(`"${name}"님, 결과가 성공적으로 제출되었습니다. 감사합니다! 🧡`); showPage('end-page'); })
-            .catch(error => { console.error("제출 오류:", error); alert("제출 중 오류가 발생했습니다."); })
-            .finally(() => { submitButton.disabled = false; submitButton.innerText = "🚀 케미 매칭!"; });
+            html2canvas(captureArea, {
+                backgroundColor: '#fdfaf5',
+                scale: 2 
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png');
+                link.download = `나의_DNA_결과_${finalResultType}.png`;
+                link.click();
+                
+                btn.disabled = false;
+                btn.innerText = "📸 캡처 하기";
+            }).catch(err => {
+                alert("이미지 저장에 실패했습니다. 다시 시도해주세요.");
+                console.error(err);
+                btn.disabled = false;
+                btn.innerText = "📸 캡처 하기";
+            });
         }
         
-        async function shareResult() { try { await navigator.share({ title: '하고잡이 & 미루잡이 DNA 테스트', text: '내 안의 하고잡이 DNA는 몇 %? 지금 바로 확인해보세요! 🧬', url: window.location.href }); } catch (err) { await navigator.clipboard.writeText(window.location.href); alert('링크가 클립보드에 복사되었습니다. 원하는 곳에 붙여넣어 공유해주세요!'); } }
-        function updateVisitorCount() { const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxyv5abwBMTEEu3FAzmktiFB_admPw4T0AACIwLDdTsXhkV0DFWD9Jx8e1YLcgDYNo/exec"; const counterElement = document.getElementById('visitor-counter'); if (SCRIPT_URL.includes("여기에")) { counterElement.textContent = "카운터 URL 설정 필요"; return; } if (!counterElement) return; const script = document.createElement('script'); const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random()); window[callbackName] = function(data) { if (data && data.count) { counterElement.textContent = `${data.count.toLocaleString()}명!`; } else { counterElement.textContent = `카운터 로딩 중..`; } document.body.removeChild(script); delete window[callbackName]; }; script.src = SCRIPT_URL + '?callback=' + callbackName; script.onerror = function() { counterElement.textContent = `카운터 연결 실패`; document.body.removeChild(script); delete window[callbackName]; }; document.body.appendChild(script); }
+        // =========================================================
+        // [수정 완료] 방문자 카운터 함수
+        // =========================================================
+        function updateVisitorCount() {
+            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwm3YtPmZVce3ypvnyI02YUIba3WE0wBPDa5eUB7axSDGK1ErwJwO1MGQfIy10YLUfL/exec"; 
+            const counterElement = document.getElementById('visitor-counter');
+
+            // URL이 비어있는지 확인하는 안전장치
+            if (!SCRIPT_URL) {
+                counterElement.style.display = 'none'; // URL이 없으면 카운터 숨기기
+                console.error("방문자 카운터 스크립트 URL이 설정되지 않았습니다.");
+                return;
+            }
+
+            // fetch API를 사용해 스크립트 URL에 요청을 보내 데이터를 가져옵니다.
+            fetch(SCRIPT_URL)
+                .then(response => {
+                    if (!response.ok) { // 응답이 성공적이지 않으면 오류 발생
+                        throw new Error(`네트워크 응답이 올바르지 않습니다: ${response.statusText}`);
+                    }
+                    return response.json(); // 응답을 JSON 형태로 변환
+                })
+                .then(data => {
+                    // 성공적으로 데이터를 받아오면 카운터에 내용을 표시합니다.
+                    if (data && data.count) {
+                        counterElement.textContent = `총 방문자: ${data.count.toLocaleString()}`;
+                    } else {
+                        throw new Error("받아온 데이터 형식이 올바르지 않습니다.");
+                    }
+                })
+                .catch(error => {
+                    // 데이터를 가져오는 중 오류가 발생하면 콘솔에 기록하고 카운터를 숨깁니다.
+                    console.error('방문자 카운터를 가져오는 중 오류 발생:', error);
+                    counterElement.style.display = 'none';
+                });
+        }
+        
+        // 페이지가 로드되면 updateVisitorCount 함수를 실행합니다.
         document.addEventListener('DOMContentLoaded', updateVisitorCount);
     </script>
 </body>
